@@ -33,9 +33,12 @@ def lint_maithili_code(code, config=LINT_CONFIG):
         stripped = line.strip()
 
         # Check for suspicious control flow or structure lines
-        if stripped.endswith(":") and not stripped.startswith(tuple(" \t")):
-            if not stripped.split()[0] in ["कार्य", "यदि", "नहि त", "वर्ग", "प्रत्येक"]:
-                errors.append(f"पंक्ति {i}: संदिग्ध ढाँचा – '{stripped}'")
+        if stripped.endswith(":"):
+            first_word = stripped.split()[0] if stripped.split() else ""
+            if first_word not in ["कार्य", "यदि", "नहि त", "वर्ग", "प्रत्येक"]:
+                # Allow nested if-else structures and simple else statements
+                if not (stripped == "नहि त:" or (stripped.startswith("नहि त") and "यदि" in stripped)):
+                    errors.append(f"पंक्ति {i}: संदिग्ध ढाँचा – '{stripped}'")
 
         # Check for improper assignment syntax
         if "=" in stripped and stripped.startswith("="):
@@ -55,11 +58,14 @@ def lint_maithili_code(code, config=LINT_CONFIG):
 
         # Naming style and assignment validation
         if "=" in stripped and not stripped.startswith("#"):
-            var_name = stripped.split("=")[0].strip()
-            if not var_name.isidentifier():
-                errors.append(f"पंक्ति {i}: चर नाम '{var_name}' वैध नहि अछि")
-            elif config.get("enforce_snake_case") and not is_snake_case(var_name):
-                errors.append(f"पंक्ति {i}: चर नाम '{var_name}' snake_case में नहि अछि")
+            # Skip print statements and function calls
+            left_side = stripped.split("=")[0].strip()
+            if not (stripped.startswith("छपाउ(") or "(" in left_side or left_side.startswith("छपाउ")):
+                var_name = left_side
+                if not var_name.isidentifier():
+                    errors.append(f"पंक्ति {i}: चर नाम '{var_name}' वैध नहि अछि")
+                elif config.get("enforce_snake_case") and not is_snake_case(var_name):
+                    errors.append(f"पंक्ति {i}: चर नाम '{var_name}' snake_case में नहि अछि")
 
         # Line length check
         if config.get("max_line_length") and len(line) > config["max_line_length"]:
