@@ -97,12 +97,24 @@ def _validate_imports(python_code, translated_modules):
     return errors
 
 
+EXIT_OK = 0
+EXIT_USAGE = 2
+EXIT_NOT_FOUND = 3
+EXIT_LINT_ERROR = 4
+EXIT_IMPORT_BLOCKED = 5
+EXIT_RUNTIME_ERROR = 6
+
+
 def run_dmai_file(file_path):
-    """Load, lint, transpile, and execute a .dmai file."""
+    """Load, lint, transpile, and execute a .dmai file.
+
+    Returns an integer exit code (0 on success, non-zero on error) so
+    callers (the CLI wrapper and CI) can detect failures reliably.
+    """
     path = Path(file_path)
     if not path.exists():
         print(f"Error: File '{file_path}' not found.")
-        return
+        return EXIT_NOT_FOUND
 
     with open(path, 'r', encoding='utf-8') as file:
         maithili_code = file.read()
@@ -113,7 +125,7 @@ def run_dmai_file(file_path):
         for err in errors:
             print("  -", err)
         print("कोड चलायल नहि गेल।\n")
-        return
+        return EXIT_LINT_ERROR
 
     try:
         maithili_code, translated_modules = translate_imports(maithili_code)
@@ -125,7 +137,7 @@ def run_dmai_file(file_path):
         if import_errors:
             for err in import_errors:
                 print(f"⚠️ त्रुटि: {err}")
-            return
+            return EXIT_IMPORT_BLOCKED
 
         # Build sandboxed execution environment
         safe_builtins = {name: getattr(_builtins, name) for name in _SAFE_BUILTIN_NAMES}
@@ -133,22 +145,30 @@ def run_dmai_file(file_path):
 
         exec_globals = {"__builtins__": safe_builtins}
         exec(python_code, exec_globals)
+        return EXIT_OK
 
     except Exception as e:
         translated = translate_exception_to_maithili(e)
         print("⚠️ त्रुटि:", translated)
+        return EXIT_RUNTIME_ERROR
 
 
-def main():
-    import sys
-    if len(sys.argv) < 2:
+def main(argv=None):
+    """CLI entry point. Returns an integer exit code."""
+    if argv is None:
+        argv = sys.argv[1:]
+
+    if argv and argv[0] in ('-V', '--version'):
+        from maithili_dsl import __version__
+        print(f"python_maithili {__version__}")
+        return EXIT_OK
+
+    if not argv:
         print("Usage: python_maithili <file.dmai>")
-    else:
-        run_dmai_file(sys.argv[1])
+        return EXIT_USAGE
+
+    return run_dmai_file(argv[0])
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python run_dmai.py <file.dmai>")
-    else:
-        run_dmai_file(sys.argv[1])
+    raise SystemExit(main())
