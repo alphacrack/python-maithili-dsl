@@ -22,8 +22,8 @@ A modern Python-compatible programming DSL that lets you write code in **Maithil
 ### 📦 Installation
 Clone the repo:
 ```bash
-git clone https://github.com/youruser/maithili-dsl.git
-cd maithili-dsl
+git clone https://github.com/alphacrack/python-maithili-dsl.git
+cd python-maithili-dsl
 ```
 
 ### 🔧 Install CLI Tool (cross-platform)
@@ -31,11 +31,13 @@ cd maithili-dsl
 pip install .
 ```
 
-Now you can run Maithili scripts using:
+Now you can run Maithili scripts using either entry point:
 ```bash
 python_maithili examples/hello.dmai
+# or, without installing the console script:
+python -m maithili_dsl examples/hello.dmai
 ```
-✅ Works on Mac, Windows, and Linux!
+✅ Works on Mac, Windows, and Linux, on Python 3.9 – 3.12.
 
 ---
 
@@ -100,6 +102,29 @@ Output:
 
 ---
 
+## 🔐 Security
+`.dmai` scripts are executed in a sandbox: a restricted `__builtins__`
+mapping (no `exec` / `eval` / `open` / `compile` / `breakpoint`) and a
+module import whitelist mapped from `MAITHILI_MODULES`. Raw Python
+`import` statements that weren't translated from Maithili names are
+rejected before execution.
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
+---
+
+## 🧪 Testing
+Contributions are expected to come with tests. Run the full suite:
+```bash
+pip install -r requirements-dev.txt
+pytest -v --cov=maithili_dsl --cov-report=term-missing
+```
+Coverage gates: ≥85% overall, ≥90% on `cli.py`, `transpile.py`, and
+`linter.py`. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full
+workflow.
+
+---
+
 ## 🤝 Contributing
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) to learn how you can help build and improve this DSL.
 
@@ -114,6 +139,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 - 🌍 Tirhuta script support
 - 🌐 Web REPL for `.dmai`
 - 🔌 VS Code extension
-- 🧪 Unit testing + CI/CD
+- `while` (`जबतक`) and `try`/`except` (`प्रयास`/`अपवाद`) keywords
+- Type hints and `mypy` in CI
 
 ---
