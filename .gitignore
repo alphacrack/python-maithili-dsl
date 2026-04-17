@@ -20,3 +20,14 @@ dist/
 # Editor folders
 .vscode/
 .idea/
+
+# Test + coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+
+# Claude Code local config
+.claude/
