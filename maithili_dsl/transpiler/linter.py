@@ -58,14 +58,22 @@ def lint_maithili_code(code, config=LINT_CONFIG):
 
         # Naming style and assignment validation
         if "=" in stripped and not stripped.startswith("#"):
-            # Skip print statements and function calls
-            left_side = stripped.split("=")[0].strip()
-            if not (stripped.startswith("छपाउ(") or "(" in left_side or left_side.startswith("छपाउ")):
-                var_name = left_side
-                if not var_name.isidentifier():
-                    errors.append(f"पंक्ति {i}: चर नाम '{var_name}' वैध नहि अछि")
-                elif config.get("enforce_snake_case") and not is_snake_case(var_name):
-                    errors.append(f"पंक्ति {i}: चर नाम '{var_name}' snake_case में नहि अछि")
+            # Skip comparison operators (==, !=, <=, >=)
+            eq_pos = stripped.index("=")
+            if eq_pos > 0 and stripped[eq_pos - 1] in "!<>":
+                pass  # comparison operator, not assignment
+            elif eq_pos + 1 < len(stripped) and stripped[eq_pos + 1] == "=":
+                pass  # == comparison
+            else:
+                left_side = stripped.split("=")[0].strip()
+                # Skip print statements, function calls, and attribute assignments (e.g., स्वयं.नाम)
+                if not (stripped.startswith("छपाउ(") or "(" in left_side
+                        or left_side.startswith("छपाउ") or "." in left_side):
+                    var_name = left_side
+                    if not var_name.isidentifier():
+                        errors.append(f"पंक्ति {i}: चर नाम '{var_name}' वैध नहि अछि")
+                    elif config.get("enforce_snake_case") and not is_snake_case(var_name):
+                        errors.append(f"पंक्ति {i}: चर नाम '{var_name}' snake_case में नहि अछि")
 
         # Line length check
         if config.get("max_line_length") and len(line) > config["max_line_length"]:
@@ -87,8 +95,11 @@ def lint_maithili_code(code, config=LINT_CONFIG):
             except IndexError:
                 errors.append(f"पंक्ति {i}: कार्य नाम सही रूप में परिभाषित नहि अछि")
 
-    # Post-scan: warn if declared functions are unused (except main)
+    # Post-scan: warn if declared functions are unused
+    # Skip नव (__init__) — it's always called implicitly via class instantiation
     for f in declared_functions:
+        if f == "नव":
+            continue  # constructor is called implicitly
         used = any(f in line for line in lines if not line.strip().startswith("कार्य"))
         if not used:
             errors.append(f"चेतावनी: कार्य '{f}' केहनो ठाम प्रयोग नहि कएल गेल अछि")
