@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python_maithili"
+version = "0.3.0"
+description = "Run Python code written in Maithili using Devanagari script"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Bishwas Jha", email = "jha.bishwas@gmail.com" },
+]
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Natural Language :: Hindi",
+    "Topic :: Software Development :: Interpreters",
+]
+
+[project.urls]
+Repository = "https://github.com/alphacrack/python-maithili-dsl"
+Issues = "https://github.com/alphacrack/python-maithili-dsl/issues"
+
+[project.scripts]
+python_maithili = "maithili_dsl.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["maithili_dsl*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+]
+markers = [
+    "smoke: end-to-end CLI smoke tests using example .dmai files",
+    "security: sandbox and import-whitelist enforcement tests",
+]
+
+[tool.coverage.run]
+source = ["maithili_dsl"]
+branch = true
+omit = [
+    "maithili_dsl/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
+show_missing = true
+skip_covered = false

@@ -1,142 +1,90 @@
-# README.md
+# 🤝 Contributing to the Devnagiri Maithili DSL
 
-# 📜 Devnagiri Maithili DSL
-
-A modern Python-compatible programming DSL that lets you write code in **Maithili** using the **Devanagari script**.
-
----
-
-## 🔧 Features
-- ✅ Full Maithili syntax mapped to Python
-- ✅ Supports OOP (classes, methods, self)
-- ✅ Devanagari numerals (`०-९`)
-- ✅ Built-in module translation (e.g., `गणित` → `math`)
-- ✅ Runtime error messages in Maithili
-- ✅ Linter with style & syntax feedback in Maithili
+Welcome! Your contributions help make the Maithili DSL stronger and more
+accessible. This guide covers local setup, the test workflow, and how to
+submit a change for review.
 
 ---
 
-## 🚀 Getting Started
+## 🛠 Development setup
 
-### 📦 Installation
-Clone the repo:
+Clone and install the package in editable mode together with the
+development dependencies:
+
 ```bash
-git clone https://github.com/youruser/maithili-dsl.git
-cd maithili-dsl
+git clone https://github.com/alphacrack/python-maithili-dsl.git
+cd python-maithili-dsl
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e .
+pip install -r requirements-dev.txt
 ```
 
-Run a sample file:
+Run a sample file to verify the CLI works:
+
 ```bash
-python run_dmai.py examples/hello.dmai
+python -m maithili_dsl examples/hello.dmai
+# or, equivalently, via the console script:
+python_maithili examples/hello.dmai
 ```
 
 ---
 
-## 📄 Example: `examples/person.dmai`
-```python
-वर्ग व्यक्ति:
-    कार्य नव(स्वयं, नाम):
-        स्वयं.नाम = नाम
+## 🧪 Running tests
 
-    कार्य बोलू(स्वयं):
-        छपाउ("हमर नाम " + स्वयं.नाम + " अछि।")
+**Always run the full suite before opening a PR.** It takes ~1 second.
 
-व्यक्ति१ = व्यक्ति("सुमन")
-व्यक्ति१.बोलू()
-```
-Output:
-```
-हमर नाम सुमन अछि।
-```
-
----
-
-## 🧠 Maithili Keywords
-| Maithili       | Python       |
-|----------------|--------------|
-| `कार्य`         | `def`         |
-| `वर्ग`          | `class`       |
-| `फेर करू`      | `return`      |
-| `स्वयं`         | `self`        |
-| `यदि`          | `if`          |
-| `नहि त`        | `else`        |
-| `प्रत्येक`      | `for`         |
-| `में`          | `in`          |
-| `सत्य`         | `True`        |
-| `मिथ्या`       | `False`       |
-| `शून्य`         | `None`        |
-
----
-
-## 📦 Built-in Modules Mapping
-| Maithili      | Python        |
-|---------------|---------------|
-| `गणित`        | `math`        |
-| `समय`         | `time`        |
-| `यादृच्छिक`   | `random`      |
-| `तिथि`        | `datetime`    |
-| `पुन`         | `re`          |
-| `संग्रह`       | `collections` |
-| `सिस्टम`       | `sys`         |
-| `पथ`          | `os.path`     |
-| `ओएस`         | `os`          |
-| `आँकड़ा`       | `statistics`  |
-
----
-
-## 🧹 Linting & Errors
-- ❗ Common mistakes caught before running
-- ❗ Runtime errors shown in Maithili:
 ```bash
-⚠️ त्रुटि: कोनो नाम घोषित नहि अछि।
+pytest -v --cov=maithili_dsl --cov-report=term-missing
 ```
 
+The test suite is organized by tier:
+
+| File | What it covers |
+|------|----------------|
+| `tests/test_numeral.py`   | Devanagari → ASCII numeral conversion |
+| `tests/test_transpile.py` | Functional: every keyword + string-literal + word-boundary regressions |
+| `tests/test_linter.py`    | Every lint rule, exception translations |
+| `tests/test_security.py`  | Sandbox: import whitelist, safe builtins, malicious-file rejection |
+| `tests/test_cli.py`       | CLI entry point, every exit code, subprocess invocation |
+| `tests/test_smoke.py`     | End-to-end: every example in `examples/` runs via the CLI |
+
+The project enforces a coverage gate of **≥85% overall** and **≥90% on
+the critical modules** (`cli.py`, `transpiler/transpile.py`,
+`transpiler/linter.py`). If your change drops coverage below that,
+please add tests.
+
+### Security changes
+
+Any change touching `cli.py`, the transpiler's string handling, the
+import whitelist (`MAITHILI_MODULES`), or the safe-builtins list
+(`_SAFE_BUILTIN_NAMES`) must include:
+
+1. A new test in `tests/test_security.py` proving the intended behavior.
+2. A short "Security Considerations" section in the PR description.
+
 ---
 
-## 🤝 Contributing
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) to learn how you can help build and improve this DSL.
+## 🧩 How you can contribute
 
----
-
-## 📄 License
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
-
----
-
-## 🌐 Future Goals
-- 🌍 Tirhuta script support
-- 🌐 Web REPL for `.dmai`
-- 🔌 VS Code extension
-- 🧪 Unit testing + CI/CD
-
----
-
-# CONTRIBUTING.md
-
-# 🤝 Contributing to Maithili DSL
-
-Welcome! Your contributions help make the Maithili DSL stronger and more accessible.
-
-## 🛠 Setup Instructions
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/youruser/maithili-dsl.git
-   cd maithili-dsl
-   ```
-2. Run a sample file:
-   ```bash
-   python run_dmai.py examples/hello.dmai
-   ```
-
-## 🧩 How You Can Contribute
-- 📚 Improve keyword mappings and add new features
-- 🧪 Write tests and examples
+- 📚 Improve keyword mappings and add new features (see `BACKLOG.md` P3)
+- 🧪 Expand test coverage, especially on edge cases
+- 🐛 Fix a backlog item (see `BACKLOG.md`)
 - 🌐 Help add Tirhuta script support
 - ✍️ Translate documentation into Maithili
+- 🔐 Report a security vulnerability via the process in `SECURITY.md`
 
-## 📬 Submitting Changes
-- Fork the repository
-- Make your changes on a branch
-- Open a Pull Request (PR) with a clear title & description
+---
+
+## 📬 Submitting changes
+
+1. Fork the repository and create a topic branch off `development`
+   (not `main` — `main` is the released line).
+2. Make your changes in logical commits — one concern per commit.
+   Follow conventional-commit style where reasonable
+   (`fix(linter): ...`, `feat(cli): ...`).
+3. Run `pytest` and make sure it's green.
+4. Open a Pull Request targeting `development`. The PR template will
+   prompt you for test evidence and any security considerations.
 
 Thanks for your interest! ❤️
