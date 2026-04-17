@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+    branches: [main, development]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }} / py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements-dev.txt
+            pyproject.toml
+
+      - name: Install package + dev deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install -r requirements-dev.txt
+
+      - name: Verify CLI entry point
+        run: |
+          python -m maithili_dsl --version
+          python_maithili --version
+
+      - name: Run tests with coverage
+        run: |
+          pytest -v --cov=maithili_dsl --cov-report=term-missing --cov-report=xml
+
+      - name: Smoke test — run every example
+        shell: bash
+        run: |
+          set -e
+          for f in examples/*.dmai; do
+            if [ "$(basename "$f")" = "error.dmai" ]; then
+              # error.dmai is intentionally broken; expect non-zero exit
+              if python -m maithili_dsl "$f"; then
+                echo "FAIL: $f should have been rejected by linter"
+                exit 1
+              fi
+              echo "OK (expected failure): $f"
+            else
+              python -m maithili_dsl "$f"
+              echo "OK: $f"
+            fi
+          done
+
+      - name: Upload coverage artifact
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          if-no-files-found: warn
