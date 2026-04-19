@@ -87,4 +87,12 @@ import whitelist (`MAITHILI_MODULES`), or the safe-builtins list
 4. Open a Pull Request targeting `development`. The PR template will
    prompt you for test evidence and any security considerations.
 
+## 📦 Releasing
+
+Releases are cut by a project maintainer following the checklist in
+[`docs/RELEASE.md`](docs/RELEASE.md). The short version:
+publishing is triggered by creating a **GitHub Release** and uses
+**Trusted Publishing (OIDC)** — no long-lived PyPI tokens are stored
+in the repo.
+
 Thanks for your interest! ❤️
