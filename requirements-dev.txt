@@ -3,3 +3,7 @@
 pytest>=7.4,<9
 pytest-cov>=4.1,<6
 pytest-timeout>=2.2,<3
+
+# Build + release tooling (used by docs/RELEASE.md workflow).
+build>=1.0,<2
+twine>=4.0,<6

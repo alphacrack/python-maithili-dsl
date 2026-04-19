@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_Nothing yet. Open a PR to add your change here._
+### Added
+- **PyPI publish pipeline** (`.github/workflows/publish.yml`) using
+  Trusted Publishing (OIDC). Triggers: GitHub Release for production
+  PyPI, pre-release or `workflow_dispatch` for TestPyPI, `build-only`
+  dispatch for a credential-free dry run. The workflow builds sdist +
+  wheel, runs `twine check --strict`, installs the wheel in a clean
+  venv, runs the full pytest suite against the installed wheel, and
+  verifies the release tag matches `__version__` before publishing.
+- **`docs/RELEASE.md`** — step-by-step release process including
+  one-time Trusted Publisher setup on PyPI + TestPyPI, routine
+  release flow, version-bump convention, and recovery procedure for
+  bad releases.
+- **`build` and `twine`** added to `requirements-dev.txt`.
 
 ## [0.3.0] — 2026-04-17
 
