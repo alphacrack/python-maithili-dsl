@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Keep GitHub Actions pinned versions current (checkout, setup-python, etc.)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "development"
+    labels: ["infra", "needs-triage"]
+
+  # Dev dependencies (pytest, coverage tooling). The package itself has
+  # zero runtime deps, so this mostly tracks requirements-dev.txt.
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "development"
+    labels: ["infra", "needs-triage"]
