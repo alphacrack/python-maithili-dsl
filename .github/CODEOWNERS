@@ -1,0 +1,8 @@
+# Default owner for everything in the repo.
+* @alphacrack
+
+# Security-sensitive paths: sandbox, transpiler string handling, CI/publish.
+/maithili_dsl/cli.py            @alphacrack
+/maithili_dsl/transpiler/       @alphacrack
+/.github/workflows/             @alphacrack
+/SECURITY.md                    @alphacrack
