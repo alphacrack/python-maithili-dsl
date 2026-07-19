@@ -1,7 +1,9 @@
 # Maithili DSL — Project Backlog
 
-> Generated: 2026-04-11 | Status: Active
-> Tracking: GitHub Issues (use `scripts/create_issues.sh` to push)
+> Generated: 2026-04-11 | Status: **Historical snapshot**
+> Live tracking has moved to [GitHub Issues](https://github.com/alphacrack/python-maithili-dsl/issues).
+> All P0 and P1 items below (plus items 11, 13–15, 19) have been resolved as of v0.3.0;
+> the remaining open items are tracked as individual issues.
 
 ---
 

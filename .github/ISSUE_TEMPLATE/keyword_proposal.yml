@@ -1,0 +1,57 @@
+name: 🔤 Keyword / mapping proposal
+description: Propose a new Maithili keyword, builtin, or module-name mapping.
+title: "[KEYWORD] "
+labels: ["enhancement", "keyword-mapping", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keyword choices shape the language for every Maithili speaker, so
+        native-speaker input on word choice is especially valuable here.
+  - type: input
+    id: maithili
+    attributes:
+      label: Proposed Maithili word (Devanagari)
+      placeholder: "जबतक"
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python equivalent
+      placeholder: "while"
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why this word?
+      description: |
+        Is this the natural Maithili term? Are there regional variants or
+        alternative spellings a reader might expect? Could it collide with
+        an existing keyword or with common identifier names?
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example usage
+      description: A short `.dmai` snippet showing the keyword in use, with the expected transpiled Python.
+      render: text
+      placeholder: |
+        गिनती = ०
+        जबतक गिनती < ५:
+            छपाउ(गिनती)
+            गिनती = गिनती + १
+    validations:
+      required: true
+  - type: dropdown
+    id: speaker
+    attributes:
+      label: Are you a Maithili speaker?
+      options:
+        - "Yes — native"
+        - "Yes — non-native / learner"
+        - "No — proposing on technical grounds only"
+    validations:
+      required: true

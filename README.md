@@ -127,6 +127,9 @@ workflow.
 
 ## 🤝 Contributing
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) to learn how you can help build and improve this DSL.
+Good entry points are issues labeled
+[`good first issue`](https://github.com/alphacrack/python-maithili-dsl/labels/good%20first%20issue).
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
