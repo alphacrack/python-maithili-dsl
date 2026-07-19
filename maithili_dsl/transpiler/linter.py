@@ -66,6 +66,9 @@ def lint_maithili_code(code, config=LINT_CONFIG):
                 pass  # == comparison
             else:
                 left_side = stripped.split("=")[0].strip()
+                left_side = re.sub(
+                    r"(?:\*\*|//|[+\-*/%])$", "", left_side
+                ).rstrip()
                 # Skip print statements, function calls, and attribute assignments (e.g., स्वयं.नाम)
                 if not (stripped.startswith("छपाउ(") or "(" in left_side
                         or left_side.startswith("छपाउ") or "." in left_side):
