@@ -32,6 +32,32 @@ def test_simple_function_with_usage_passes():
     assert lint_maithili_code(code) == []
 
 
+def test_function_name_inside_longer_identifier_is_unused():
+    code = (
+        "कार्य जोड़():\n"
+        "    फेर करू १\n"
+        "\n"
+        "जोड़ल = ५\n"
+    )
+
+    errors = lint_maithili_code(code)
+
+    assert "चेतावनी: कार्य 'जोड़' केहनो ठाम प्रयोग नहि कएल गेल अछि" in errors
+
+
+def test_function_name_inside_string_is_unused():
+    code = (
+        "कार्य जोड़():\n"
+        "    फेर करू १\n"
+        "\n"
+        "छपाउ(\"जोड़()\")\n"
+    )
+
+    errors = lint_maithili_code(code)
+
+    assert "चेतावनी: कार्य 'जोड़' केहनो ठाम प्रयोग नहि कएल गेल अछि" in errors
+
+
 def test_class_with_constructor_passes():
     code = (
         "वर्ग व्यक्ति:\n"

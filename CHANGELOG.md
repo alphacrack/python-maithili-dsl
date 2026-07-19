@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bad releases.
 - **`build` and `twine`** added to `requirements-dev.txt`.
 
+### Fixed
+- **Unused-function checks accepted identifier substrings as calls.** Function
+  names now require a real Devanagari-aware call site outside strings and
+  comments. Closes #31.
+
 ## [0.3.0] — 2026-04-17
 
 This is a hardening and correctness release. Every P0 finding in
