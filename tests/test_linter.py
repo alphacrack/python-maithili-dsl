@@ -228,49 +228,50 @@ def test_unknown_exception_falls_through():
 
 
 def test_parens_inside_double_quoted_string_not_flagged():
-    code = '\u091b\u092a\u093e\u0909("(\u0915")\n'
+    code = 'छपाउ("(क")\n'
     errors = lint_maithili_code(code)
     assert not any(
-        "\u0917\u094b\u0932 \u092c\u094d\u0930\u0948\u0915\u0947\u091f" in e
+        "गोल ब्रैकेट" in e
         for e in errors
     ), f"parens inside double-quoted string falsely flagged: {errors}"
 
 
 def test_parens_inside_single_quoted_string_not_flagged():
-    code = "\u091b\u092a\u093e\u0909('(\u0915')\n"
+    code = "छपाउ('(क')\n"
     errors = lint_maithili_code(code)
     assert not any(
-        "\u0917\u094b\u0932 \u092c\u094d\u0930\u0948\u0915\u0947\u091f" in e
+        "गोल ब्रैकेट" in e
         for e in errors
     ), f"parens inside single-quoted string falsely flagged: {errors}"
 
 
 def test_quote_inside_string_not_flagged():
-    code = '\u091b\u092a\u093e\u0909("it''s ok")\n'
+    code = 'छपाउ("it\'s ok")\n'
+    assert "it's ok" in code
     errors = lint_maithili_code(code)
-    assert not any("\u0909\u0926\u094d\u0927\u0930\u0923" in e for e in errors), (
+    assert not any("उद्धरण" in e for e in errors), (
         f"apostrophe in double-quoted string falsely flagged: {errors}"
     )
 
 
 def test_unbalanced_single_quote_flagged():
-    code = "\u091b\u092a\u093e\u0909('hi)\n"
+    code = "छपाउ('hi)\n"
     errors = lint_maithili_code(code)
-    assert any("\u0909\u0926\u094d\u0927\u0930\u0923" in e for e in errors), (
+    assert any("उद्धरण" in e for e in errors), (
         f"unbalanced single quote not flagged: {errors}"
     )
 
 
 def test_genuinely_unbalanced_parens_still_flagged():
-    errors = lint_maithili_code("\u091b\u092a\u093e\u0909(x\n")
+    errors = lint_maithili_code("छपाउ(x\n")
     assert any(
-        "\u0917\u094b\u0932 \u092c\u094d\u0930\u0948\u0915\u0947\u091f" in e
+        "गोल ब्रैकेट" in e
         for e in errors
     ), f"genuinely unbalanced parens not flagged: {errors}"
 
 
 def test_genuinely_unbalanced_quotes_still_flagged():
-    errors = lint_maithili_code('\u091b\u092a\u093e\u0909("hi)\n')
-    assert any("\u0909\u0926\u094d\u0927\u0930\u0923" in e for e in errors), (
+    errors = lint_maithili_code('छपाउ("hi)\n')
+    assert any("उद्धरण" in e for e in errors), (
         f"genuinely unbalanced quotes not flagged: {errors}"
     )
