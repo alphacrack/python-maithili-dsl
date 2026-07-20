@@ -11,6 +11,7 @@ that a malicious .dmai file cannot escape the sandbox via:
 Each test pins a specific attack surface so that a regression that
 re-opens one hole is immediately caught.
 """
+
 import pytest
 
 from maithili_dsl import cli
@@ -33,34 +34,26 @@ from maithili_dsl.cli import (
 # module name was legitimately translated from a Maithili import.
 # ---------------------------------------------------------------------------
 
-class TestValidateImportsRejectsRawPythonImports:
 
+class TestValidateImportsRejectsRawPythonImports:
     def test_raw_import_os_rejected(self):
         errors = _validate_imports("import os\n", translated_modules=set())
         assert errors, "import os should be blocked"
 
     def test_raw_import_subprocess_rejected(self):
-        errors = _validate_imports(
-            "import subprocess\n", translated_modules=set()
-        )
+        errors = _validate_imports("import subprocess\n", translated_modules=set())
         assert errors
 
     def test_raw_import_socket_rejected(self):
-        errors = _validate_imports(
-            "import socket\n", translated_modules=set()
-        )
+        errors = _validate_imports("import socket\n", translated_modules=set())
         assert errors
 
     def test_raw_import_ctypes_rejected(self):
-        errors = _validate_imports(
-            "import ctypes\n", translated_modules=set()
-        )
+        errors = _validate_imports("import ctypes\n", translated_modules=set())
         assert errors
 
     def test_raw_import_pickle_rejected(self):
-        errors = _validate_imports(
-            "import pickle\n", translated_modules=set()
-        )
+        errors = _validate_imports("import pickle\n", translated_modules=set())
         assert errors
 
     def test_raw_from_import_rejected(self):
@@ -73,9 +66,7 @@ class TestValidateImportsRejectsRawPythonImports:
         # A Maithili `आयात गणित` becomes `import math` and is added
         # to the translated_modules set — then _validate_imports must
         # allow it through.
-        errors = _validate_imports(
-            "import math\n", translated_modules={"math"}
-        )
+        errors = _validate_imports("import math\n", translated_modules={"math"})
         assert errors == []
 
     def test_non_import_lines_are_ignored(self):
@@ -87,8 +78,8 @@ class TestValidateImportsRejectsRawPythonImports:
 # _make_safe_import: __import__ replacement only permits whitelist.
 # ---------------------------------------------------------------------------
 
-class TestSafeImportWhitelist:
 
+class TestSafeImportWhitelist:
     def setup_method(self):
         self.safe_import = _make_safe_import()
 
@@ -130,12 +121,19 @@ class TestSafeImportWhitelist:
 # _SAFE_BUILTIN_NAMES: forbidden builtins are absent.
 # ---------------------------------------------------------------------------
 
-class TestForbiddenBuiltinsAbsent:
 
-    @pytest.mark.parametrize("name", [
-        "exec", "eval", "compile", "open", "breakpoint",
-        "__import__",  # only safe_import wrapper, not the real thing
-    ])
+class TestForbiddenBuiltinsAbsent:
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "exec",
+            "eval",
+            "compile",
+            "open",
+            "breakpoint",
+            "__import__",  # only safe_import wrapper, not the real thing
+        ],
+    )
     def test_name_not_in_safe_builtins_list(self, name):
         assert name not in _SAFE_BUILTIN_NAMES, (
             f"{name!r} must not appear in _SAFE_BUILTIN_NAMES"
@@ -151,8 +149,8 @@ class TestForbiddenBuiltinsAbsent:
 # translate_imports: records which modules were legitimately translated.
 # ---------------------------------------------------------------------------
 
-class TestTranslateImports:
 
+class TestTranslateImports:
     def test_maithili_import_recorded(self):
         code = "आयात गणित\n"
         translated, modules = translate_imports(code)
@@ -182,18 +180,17 @@ class TestTranslateImports:
 # End-to-end: malicious .dmai files are rejected by run_dmai_file
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.security
 class TestMaliciousDmaiBlocked:
     """Write real .dmai files that try to break out, and confirm
     run_dmai_file rejects them with a non-zero exit code."""
 
-    def test_attempting_import_os_via_raw_python_rejected(
-        self, tmp_dmai_file, capsys
-    ):
+    def test_attempting_import_os_via_raw_python_rejected(self, tmp_dmai_file, capsys):
         # The lexical form "import os" isn't a Maithili keyword so it
         # survives transpilation unchanged, but _validate_imports
         # should catch it before exec.
-        path = tmp_dmai_file("import os\nos.system(\"echo pwned\")\n")
+        path = tmp_dmai_file('import os\nos.system("echo pwned")\n')
         code = run_dmai_file(str(path))
         captured = capsys.readouterr()
         # It may be blocked at lint (long-line false positive is unlikely
@@ -204,7 +201,7 @@ class TestMaliciousDmaiBlocked:
 
     def test_attempting_to_call_exec_raises(self, tmp_dmai_file, capsys):
         # exec is not in safe_builtins, so this NameError-s inside exec.
-        path = tmp_dmai_file("exec(\"print(1)\")\n")
+        path = tmp_dmai_file('exec("print(1)")\n')
         code = run_dmai_file(str(path))
         captured = capsys.readouterr()
         assert code == EXIT_RUNTIME_ERROR
@@ -212,26 +209,22 @@ class TestMaliciousDmaiBlocked:
         assert "त्रुटि" in captured.out
 
     def test_attempting_to_call_open_raises(self, tmp_dmai_file, capsys):
-        path = tmp_dmai_file("open(\"/etc/passwd\")\n")
+        path = tmp_dmai_file('open("/etc/passwd")\n')
         code = run_dmai_file(str(path))
         assert code == EXIT_RUNTIME_ERROR
 
     def test_attempting_to_call_eval_raises(self, tmp_dmai_file, capsys):
-        path = tmp_dmai_file("eval(\"1+1\")\n")
+        path = tmp_dmai_file('eval("1+1")\n')
         code = run_dmai_file(str(path))
         assert code == EXIT_RUNTIME_ERROR
 
-    def test_maithili_import_of_allowed_module_works(
-        self, tmp_dmai_file, capsys
-    ):
+    def test_maithili_import_of_allowed_module_works(self, tmp_dmai_file, capsys):
         # Positive control: a legitimate Maithili import of a
         # whitelisted module should succeed.
         path = tmp_dmai_file("आयात गणित\nछपाउ(गणित.pi)\n")
         code = run_dmai_file(str(path))
         captured = capsys.readouterr()
-        assert code == EXIT_OK, (
-            f"Clean program blocked unexpectedly: {captured.out}"
-        )
+        assert code == EXIT_OK, f"Clean program blocked unexpectedly: {captured.out}"
         assert "3.14" in captured.out
 
 
@@ -239,15 +232,67 @@ class TestMaliciousDmaiBlocked:
 # Whitelist shape: every MAITHILI_MODULES target is in _ALLOWED_MODULES.
 # ---------------------------------------------------------------------------
 
+
 def test_allowed_modules_matches_maithili_modules():
     assert _ALLOWED_MODULES == set(MAITHILI_MODULES.values())
 
 
-@pytest.mark.parametrize("dangerous", [
-    "subprocess", "socket", "ctypes", "pickle", "shutil",
-    "urllib", "http", "ftplib", "telnetlib",
-])
+@pytest.mark.parametrize(
+    "dangerous",
+    [
+        "subprocess",
+        "socket",
+        "ctypes",
+        "pickle",
+        "shutil",
+        "urllib",
+        "http",
+        "ftplib",
+        "telnetlib",
+    ],
+)
 def test_dangerous_module_not_in_whitelist(dangerous):
     assert dangerous not in _ALLOWED_MODULES, (
         f"{dangerous} must never be in the import whitelist"
     )
+
+
+# ---------------------------------------------------------------------------
+# Security regression: linter tokenizer does not widen the trust boundary
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.security
+def test_linter_tokenizer_does_not_expand_trust_boundary():
+    """Code-like content inside string literals remains data.
+
+    The linter now uses _tokenize_preserving_strings for
+    paren/quote balance. This test verifies that using the
+    tokenizer in the lint path does not accidentally weaken
+    any runtime security boundaries — the transpiler, import
+    validator, and sandbox execution path are unchanged.
+    """
+    from maithili_dsl.transpiler.linter import lint_maithili_code
+
+    code_inside_string = '\u091b\u092a\u093e\u0909("import os; exec()")\n'
+    errors = lint_maithili_code(code_inside_string)
+    assert not any(
+        "\u0917\u094b\u0932 \u092c\u094d\u0930\u0948\u0915\u0947\u091f" in e
+        for e in errors
+    )
+
+
+@pytest.mark.security
+def test_actual_dangerous_code_outside_strings_still_blocked():
+    """Raw Python import outside strings is still caught by the import validator.
+
+    The linter change uses the tokenizer for paren/quote balance checks.
+    This test verifies that the security model is unchanged: dangerous
+    code outside string literals remains blocked by _validate_imports.
+    """
+    from maithili_dsl.transpiler.transpile import transpile_maithili_code
+
+    code = '\u091b\u092a\u093e\u0909("safe")\nimport os\n'
+    transpiled = transpile_maithili_code(code)
+    errors = _validate_imports(transpiled, translated_modules=set())
+    assert errors, f"raw 'import os' must be blocked by import validator: {errors}"

@@ -2,6 +2,8 @@
 
 import re
 
+from .transpile import _tokenize_preserving_strings
+
 LINT_CONFIG = {
     "enforce_snake_case": False,
     "max_line_length": 80,
@@ -44,12 +46,18 @@ def lint_maithili_code(code, config=LINT_CONFIG):
         if "=" in stripped and stripped.startswith("="):
             errors.append(f"पंक्ति {i}: '=' चिह्नक पहिले कोनो मान अपेक्षित अछि")
 
-        # Check for unbalanced parentheses or quotes
-        if stripped.count("(") != stripped.count(")"):
+        # Check for unbalanced parentheses or quotes.
+        # Tokenize the line and count only in code regions so that
+        # parens and quotes inside string literals are not counted.
+        tokens = _tokenize_preserving_strings(line)
+        code_parts = [text for is_str, text in tokens if not is_str]
+        code_line = "".join(code_parts)
+        if code_line.count("(") != code_line.count(")"):
             errors.append(f"पंक्ति {i}: गोल ब्रैकेट असंतुलित अछि")
-        if stripped.count("\"") % 2 != 0:
+        if code_line.count("\"") % 2 != 0:
             errors.append(f"पंक्ति {i}: उद्धरण चिह्न जोड़ा में नहि अछि")
-
+        if code_line.count("'") % 2 != 0:
+            errors.append(f"पंक्ति {i}: उद्धरण चिह्न जोड़ा में नहि अछि")
         # Check for indentation (must start with 4-space or tab if inside block)
         if line and not line.startswith(" ") and not stripped.endswith(":") and i > 1:
             prev = lines[i-2].strip()

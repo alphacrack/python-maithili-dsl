@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Parentheses and quote characters inside string literals no longer trigger false unbalanced-linter warnings.
+- Single-quote balance is now checked alongside double-quote balance (previously only double quotes were validated).
 - Augmented assignments no longer produce invalid-variable-name linter errors.
 
 ### Added
