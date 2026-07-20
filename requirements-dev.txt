@@ -2,7 +2,7 @@
 # Runtime has zero dependencies — everything here is for tests and tooling.
 pytest>=7.4,<9
 pytest-cov>=7.1.0,<8
-pytest-timeout>=2.2,<3
+pytest-timeout>=2.4.0,<3
 
 # Build + release tooling (used by docs/RELEASE.md workflow).
 build>=1.0,<2
