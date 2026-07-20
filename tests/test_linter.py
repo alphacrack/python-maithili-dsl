@@ -4,7 +4,6 @@ Covers the post-fix behavior: == is not flagged as assignment, नव
 (constructor) is not flagged as unused, and all the structural checks
 still fire on genuinely broken input.
 """
-
 import pytest
 
 from maithili_dsl.transpiler.linter import (
@@ -19,13 +18,17 @@ from maithili_dsl.transpiler.linter import (
 # Clean / passing code
 # ---------------------------------------------------------------------------
 
-
 def test_empty_code_has_no_errors():
     assert lint_maithili_code("") == []
 
 
 def test_simple_function_with_usage_passes():
-    code = 'कार्य नमस्कार():\n    छपाउ("hi")\n\nनमस्कार()\n'
+    code = (
+        "कार्य नमस्कार():\n"
+        "    छपाउ(\"hi\")\n"
+        "\n"
+        "नमस्कार()\n"
+    )
     assert lint_maithili_code(code) == []
 
 
@@ -35,7 +38,7 @@ def test_class_with_constructor_passes():
         "    कार्य नव(स्वयं, नाम):\n"
         "        स्वयं.नाम = नाम\n"
         "\n"
-        'व्यक्ति१ = व्यक्ति("सुमन")\n'
+        "व्यक्ति१ = व्यक्ति(\"सुमन\")\n"
     )
     errors = lint_maithili_code(code)
     # The नव constructor is called implicitly via instantiation,
@@ -47,7 +50,6 @@ def test_class_with_constructor_passes():
 # ---------------------------------------------------------------------------
 # Comparison operators are not assignments
 # ---------------------------------------------------------------------------
-
 
 class TestComparisonNotFlaggedAsAssignment:
     """Pre-fix bug: `x == 5` parsed as an assignment with var name
@@ -87,7 +89,6 @@ def test_augmented_assignment_not_flagged_as_invalid_name(operator):
 # Structural errors still fire
 # ---------------------------------------------------------------------------
 
-
 def test_leading_equals_sign_flagged():
     errors = lint_maithili_code("= ५\n")
     assert any("'=' चिह्नक पहिले" in e for e in errors)
@@ -109,7 +110,7 @@ def test_suspicious_block_flagged():
 
 
 def test_missing_indent_after_colon_flagged():
-    code = 'कार्य f():\nछपाउ("x")\n'
+    code = "कार्य f():\nछपाउ(\"x\")\n"
     errors = lint_maithili_code(code)
     assert any("इनडेन्टेशन" in e for e in errors)
 
@@ -118,16 +119,15 @@ def test_missing_indent_after_colon_flagged():
 # Line length
 # ---------------------------------------------------------------------------
 
-
 def test_long_line_flagged_by_default():
-    long_line = 'x = "' + ("अ" * 100) + '"\n'
+    long_line = "x = \"" + ("अ" * 100) + "\"\n"
     errors = lint_maithili_code(long_line)
     assert any("पंक्ति बहुत लंबा" in e for e in errors)
 
 
 def test_line_length_config_override():
     config = dict(LINT_CONFIG, max_line_length=200)
-    long_line = 'x = "' + ("अ" * 100) + '"\n'
+    long_line = "x = \"" + ("अ" * 100) + "\"\n"
     errors = lint_maithili_code(long_line, config=config)
     assert not any("पंक्ति बहुत लंबा" in e for e in errors)
 
@@ -136,7 +136,6 @@ def test_line_length_config_override():
 # Unused function detection
 # ---------------------------------------------------------------------------
 
-
 def test_unused_regular_function_flagged():
     code = "कार्य अप्रयुक्त():\n    फेर करू १\n"
     errors = lint_maithili_code(code)
@@ -144,14 +143,25 @@ def test_unused_regular_function_flagged():
 
 
 def test_used_function_not_flagged():
-    code = "कार्य प्रयुक्त():\n    फेर करू १\n\nप्रयुक्त()\n"
+    code = (
+        "कार्य प्रयुक्त():\n"
+        "    फेर करू १\n"
+        "\n"
+        "प्रयुक्त()\n"
+    )
     errors = lint_maithili_code(code)
     assert not any("प्रयुक्त" in e and "प्रयोग नहि" in e for e in errors)
 
 
 def test_init_never_flagged_even_when_not_called_by_name():
     # नव is called implicitly via class instantiation — never by name.
-    code = "वर्ग क:\n    कार्य नव(स्वयं):\n        स्वयं.x = १\n\nओब = क()\n"
+    code = (
+        "वर्ग क:\n"
+        "    कार्य नव(स्वयं):\n"
+        "        स्वयं.x = १\n"
+        "\n"
+        "ओब = क()\n"
+    )
     errors = lint_maithili_code(code)
     assert not any("नव" in e and "प्रयोग नहि" in e for e in errors)
 
@@ -159,7 +169,6 @@ def test_init_never_flagged_even_when_not_called_by_name():
 # ---------------------------------------------------------------------------
 # is_snake_case / snake_case enforcement toggle
 # ---------------------------------------------------------------------------
-
 
 def test_is_snake_case_positive_cases():
     assert is_snake_case("foo_bar")
@@ -191,19 +200,15 @@ def test_snake_case_enforced_when_enabled():
 # Exception translation
 # ---------------------------------------------------------------------------
 
-
-@pytest.mark.parametrize(
-    "exc_type,must_contain",
-    [
-        (SyntaxError, "वाक्य संरचना"),
-        (NameError, "नाम"),
-        (TypeError, "प्रकार"),
-        (ValueError, "मान"),
-        (AttributeError, "गुण"),
-        (IndexError, "सूची सीमा"),
-        (KeyError, "कुंजी"),
-    ],
-)
+@pytest.mark.parametrize("exc_type,must_contain", [
+    (SyntaxError, "वाक्य संरचना"),
+    (NameError, "नाम"),
+    (TypeError, "प्रकार"),
+    (ValueError, "मान"),
+    (AttributeError, "गुण"),
+    (IndexError, "सूची सीमा"),
+    (KeyError, "कुंजी"),
+])
 def test_known_exceptions_translated(exc_type, must_contain):
     exc = exc_type("demo")
     out = translate_exception_to_maithili(exc)
@@ -216,7 +221,6 @@ def test_unknown_exception_falls_through():
 
     out = translate_exception_to_maithili(CustomError("demo"))
     assert "CustomError" in out
-
 
 # ---------------------------------------------------------------------------
 # Regression: parens and quotes inside string literals (issue #30)
@@ -242,7 +246,7 @@ def test_parens_inside_single_quoted_string_not_flagged():
 
 
 def test_quote_inside_string_not_flagged():
-    code = '\u091b\u092a\u093e\u0909("it\'s ok")\n'
+    code = '\u091b\u092a\u093e\u0909("it''s ok")\n'
     errors = lint_maithili_code(code)
     assert not any("\u0909\u0926\u094d\u0927\u0930\u0923" in e for e in errors), (
         f"apostrophe in double-quoted string falsely flagged: {errors}"
