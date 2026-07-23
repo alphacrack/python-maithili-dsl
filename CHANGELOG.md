@@ -29,6 +29,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bad releases.
 - **`build` and `twine`** added to `requirements-dev.txt`.
 
+### Fixed
+- **Unused-function checks accepted identifier substrings as calls.** Function
+  names now require a real Devanagari-aware call site outside strings and
+  comments. Closes #31.
+  - Known trade-off: because a call now requires `name(`, passing a function as
+    a value (`x = जोड़`, `map(जोड़, …)`) counts as *unused* and warns. This is a
+    deliberate choice favoring clarity for learner-oriented code over
+    higher-order usage.
+
 ## [0.3.0] — 2026-04-17
 
 This is a hardening and correctness release. Every P0 finding in
