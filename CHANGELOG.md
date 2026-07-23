@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **Dropped support for Python 3.9** (end-of-life since October 2025).
+  Minimum supported version is now Python 3.10. This unblocks dev-tool
+  upgrades (pytest 9, build 1.5+) that no longer support 3.9. Closes #44.
+
 ### Fixed
 - Augmented assignments no longer produce invalid-variable-name linter errors.
 

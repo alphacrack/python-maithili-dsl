@@ -1,9 +1,9 @@
 # Development dependencies for python_maithili.
 # Runtime has zero dependencies — everything here is for tests and tooling.
-pytest>=7.4,<9
+pytest>=9.1.1,<10
 pytest-cov>=7.1.0,<8
 pytest-timeout>=2.4.0,<3
 
 # Build + release tooling (used by docs/RELEASE.md workflow).
-build>=1.0,<2
+build>=1.5.0,<2
 twine>=6.2.0,<7
