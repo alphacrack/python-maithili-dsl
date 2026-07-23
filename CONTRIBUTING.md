@@ -102,14 +102,16 @@ word choice is especially welcome.
 
 ## 📬 Submitting changes
 
-1. Fork the repository and create a topic branch off `development`
-   (not `main` — `main` is the released line).
+1. Fork the repository and create a topic branch off `main`
+   (this project uses a single-branch model — `main` is the trunk,
+   and releases are tagged from it).
 2. Make your changes in logical commits — one concern per commit.
    Follow conventional-commit style where reasonable
    (`fix(linter): ...`, `feat(cli): ...`).
 3. Run `pytest` and make sure it's green.
-4. Open a Pull Request targeting `development`. The PR template will
+4. Open a Pull Request targeting `main`. The PR template will
    prompt you for test evidence and any security considerations.
+   All PRs must pass the required `ci-ok` status check before merge.
 
 ## 📦 Releasing
 
