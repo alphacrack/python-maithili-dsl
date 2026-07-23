@@ -78,6 +78,13 @@ class TestComparisonNotFlaggedAsAssignment:
         assert not any("चर नाम" in e for e in errors)
 
 
+@pytest.mark.parametrize("operator", ["+=", "-=", "*=", "/=", "//=", "%=", "**="])
+def test_augmented_assignment_not_flagged_as_invalid_name(operator):
+    code = f"क = ०\nक {operator} १\n"
+    errors = lint_maithili_code(code)
+    assert not any("चर नाम" in error for error in errors)
+
+
 # ---------------------------------------------------------------------------
 # Structural errors still fire
 # ---------------------------------------------------------------------------
