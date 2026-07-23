@@ -7,7 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_Nothing yet. Open a PR to add your change here._
+## [0.4.0] — 2026-07-23
+
+First release published to PyPI since 0.2.0 (0.3.0 was an internal
+release that was never pushed to the index). This release bundles the
+0.3.0 hardening work plus the fixes and tooling below.
+
+### Added
+- **PyPI publish pipeline** (`.github/workflows/publish.yml`) using
+  Trusted Publishing (OIDC). Triggers: GitHub Release for production
+  PyPI, pre-release or `workflow_dispatch` for TestPyPI, `build-only`
+  dispatch for a credential-free dry run. The workflow builds sdist +
+  wheel, runs `twine check --strict`, installs the wheel in a clean
+  venv, runs the full pytest suite against the installed wheel, and
+  verifies the release tag matches `__version__` before publishing.
+- **`docs/RELEASE.md`** — step-by-step release process including
+  one-time Trusted Publisher setup on PyPI + TestPyPI, routine
+  release flow, version-bump convention, and recovery procedure for
+  bad releases.
+- **`build` and `twine`** added to `requirements-dev.txt`.
+- **`examples/README.md`** documenting every bundled example program,
+  the keywords each demonstrates, and expected output. Closes #41.
+- **Enforced coverage gate.** `fail_under = 85` in `pyproject.toml`'s
+  `[tool.coverage.report]` so a coverage regression fails CI. Closes #42.
+
+### Fixed
+- **Augmented assignments flagged as invalid variable names.** `+=`,
+  `-=`, `*=`, `/=`, `//=`, `%=`, `**=` no longer produce a spurious
+  "invalid variable name" linter error. Closes #29.
+- **Unused-function checks accepted identifier substrings as calls.**
+  Function names now require a real Devanagari-aware call site outside
+  strings and comments. Closes #31.
+  - Known trade-off: because a call now requires `name(`, passing a
+    function as a value (`x = जोड़`, `map(जोड़, …)`) counts as *unused*
+    and warns. This is a deliberate choice favoring clarity for
+    learner-oriented code over higher-order usage.
+
+### Removed
+- **Dropped support for Python 3.9** (end-of-life since October 2025).
+  Minimum supported version is now Python 3.10. This unblocks dev-tool
+  upgrades (pytest 9, build 1.5+) that no longer support 3.9. Closes #44.
 
 ## [0.3.0] — 2026-04-17
 

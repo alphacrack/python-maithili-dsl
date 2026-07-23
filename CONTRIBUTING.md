@@ -4,6 +4,9 @@ Welcome! Your contributions help make the Maithili DSL stronger and more
 accessible. This guide covers local setup, the test workflow, and how to
 submit a change for review.
 
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold it.
+
 ---
 
 ## 🛠 Development setup
@@ -74,6 +77,27 @@ import whitelist (`MAITHILI_MODULES`), or the safe-builtins list
 - ✍️ Translate documentation into Maithili
 - 🔐 Report a security vulnerability via the process in `SECURITY.md`
 
+### Finding something to work on
+
+Issues labeled [`good first issue`](https://github.com/alphacrack/python-maithili-dsl/labels/good%20first%20issue)
+are scoped for newcomers; [`help wanted`](https://github.com/alphacrack/python-maithili-dsl/labels/help%20wanted)
+issues are open to anyone. Labels follow a simple scheme:
+
+| Label group | Meaning |
+|-------------|---------|
+| `P0`–`P3` | Priority, from critical to nice-to-have |
+| `bug`, `enhancement`, `documentation`, `question` | Issue type |
+| `security`, `testing`, `infra`, `packaging`, `quality`, `compliance` | Category |
+| `area:transpiler`, `area:linter`, `area:cli` | Part of the codebase affected |
+| `keyword-mapping` | Proposals for new Maithili keywords or module mappings |
+| `translation` | Translating docs or messages into Maithili |
+| `needs-triage` | New issue awaiting a maintainer's look |
+
+Comment on an issue before starting significant work so it can be assigned
+to you and effort isn't duplicated. New keyword ideas should go through the
+**🔤 Keyword / mapping proposal** issue template — native-speaker input on
+word choice is especially welcome.
+
 ---
 
 ## 📬 Submitting changes
@@ -86,5 +110,13 @@ import whitelist (`MAITHILI_MODULES`), or the safe-builtins list
 3. Run `pytest` and make sure it's green.
 4. Open a Pull Request targeting `development`. The PR template will
    prompt you for test evidence and any security considerations.
+
+## 📦 Releasing
+
+Releases are cut by a project maintainer following the checklist in
+[`docs/RELEASE.md`](docs/RELEASE.md). The short version:
+publishing is triggered by creating a **GitHub Release** and uses
+**Trusted Publishing (OIDC)** — no long-lived PyPI tokens are stored
+in the repo.
 
 Thanks for your interest! ❤️

@@ -37,7 +37,9 @@ python_maithili examples/hello.dmai
 # or, without installing the console script:
 python -m maithili_dsl examples/hello.dmai
 ```
-✅ Works on Mac, Windows, and Linux, on Python 3.9 – 3.12.
+✅ Works on Mac, Windows, and Linux, on Python 3.10 – 3.12.
+
+See [`examples/README.md`](examples/README.md) for a description of every bundled example program.
 
 ---
 
@@ -127,6 +129,9 @@ workflow.
 
 ## 🤝 Contributing
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) to learn how you can help build and improve this DSL.
+Good entry points are issues labeled
+[`good first issue`](https://github.com/alphacrack/python-maithili-dsl/labels/good%20first%20issue).
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 

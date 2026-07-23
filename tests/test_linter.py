@@ -32,6 +32,32 @@ def test_simple_function_with_usage_passes():
     assert lint_maithili_code(code) == []
 
 
+def test_function_name_inside_longer_identifier_is_unused():
+    code = (
+        "कार्य जोड़():\n"
+        "    फेर करू १\n"
+        "\n"
+        "जोड़ल = ५\n"
+    )
+
+    errors = lint_maithili_code(code)
+
+    assert "चेतावनी: कार्य 'जोड़' केहनो ठाम प्रयोग नहि कएल गेल अछि" in errors
+
+
+def test_function_name_inside_string_is_unused():
+    code = (
+        "कार्य जोड़():\n"
+        "    फेर करू १\n"
+        "\n"
+        "छपाउ(\"जोड़()\")\n"
+    )
+
+    errors = lint_maithili_code(code)
+
+    assert "चेतावनी: कार्य 'जोड़' केहनो ठाम प्रयोग नहि कएल गेल अछि" in errors
+
+
 def test_class_with_constructor_passes():
     code = (
         "वर्ग व्यक्ति:\n"
@@ -76,6 +102,13 @@ class TestComparisonNotFlaggedAsAssignment:
         code = "यदि x >= ५:\n    छपाउ(x)\n"
         errors = lint_maithili_code(code)
         assert not any("चर नाम" in e for e in errors)
+
+
+@pytest.mark.parametrize("operator", ["+=", "-=", "*=", "/=", "//=", "%=", "**="])
+def test_augmented_assignment_not_flagged_as_invalid_name(operator):
+    code = f"क = ०\nक {operator} १\n"
+    errors = lint_maithili_code(code)
+    assert not any("चर नाम" in error for error in errors)
 
 
 # ---------------------------------------------------------------------------
