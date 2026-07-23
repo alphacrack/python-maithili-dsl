@@ -37,7 +37,7 @@ python_maithili examples/hello.dmai
 # or, without installing the console script:
 python -m maithili_dsl examples/hello.dmai
 ```
-✅ Works on Mac, Windows, and Linux, on Python 3.9 – 3.12.
+✅ Works on Mac, Windows, and Linux, on Python 3.10 – 3.12.
 
 ---
 
