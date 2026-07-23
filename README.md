@@ -39,6 +39,8 @@ python -m maithili_dsl examples/hello.dmai
 ```
 ✅ Works on Mac, Windows, and Linux, on Python 3.10 – 3.12.
 
+See [`examples/README.md`](examples/README.md) for a description of every bundled example program.
+
 ---
 
 ## 📄 Example: `examples/person.dmai`
