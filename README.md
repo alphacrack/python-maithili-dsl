@@ -1,6 +1,10 @@
-# README.md
-
 # 📜 Devnagiri Maithili DSL
+
+[![CI](https://github.com/alphacrack/python-maithili-dsl/actions/workflows/ci.yml/badge.svg)](https://github.com/alphacrack/python-maithili-dsl/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/python-maithili.svg)](https://pypi.org/project/python-maithili/)
+[![Python versions](https://img.shields.io/pypi/pyversions/python-maithili.svg)](https://pypi.org/project/python-maithili/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 A modern Python-compatible programming DSL that lets you write code in **Maithili** using the **Devanagari script**.
 
