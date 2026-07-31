@@ -2,7 +2,7 @@
 
 import re
 
-from .transpile import _tokenize_preserving_strings
+from .transpile import _make_keyword_pattern, _tokenize_preserving_strings
 
 LINT_CONFIG = {
     "enforce_snake_case": False,
@@ -111,7 +111,14 @@ def lint_maithili_code(code, config=LINT_CONFIG):
     for f in declared_functions:
         if f == "नव":
             continue  # constructor is called implicitly
-        used = any(f in line for line in lines if not line.strip().startswith("कार्य"))
+        call_pattern = re.compile(_make_keyword_pattern(f).pattern + r"\s*\(")
+        used = any(
+            call_pattern.search(text)
+            for line in lines
+            if not line.strip().startswith("कार्य")
+            for is_string, text in _tokenize_preserving_strings(line)
+            if not is_string
+        )
         if not used:
             errors.append(f"चेतावनी: कार्य '{f}' केहनो ठाम प्रयोग नहि कएल गेल अछि")
 
