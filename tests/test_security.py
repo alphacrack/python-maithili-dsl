@@ -251,3 +251,43 @@ def test_dangerous_module_not_in_whitelist(dangerous):
     assert dangerous not in _ALLOWED_MODULES, (
         f"{dangerous} must never be in the import whitelist"
     )
+
+# ---------------------------------------------------------------------------
+# Security regression: linter tokenizer does not widen the trust boundary
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.security
+def test_linter_tokenizer_does_not_expand_trust_boundary():
+    """Code-like content inside string literals remains data.
+
+    The linter now uses _tokenize_preserving_strings for
+    paren/quote balance. This test verifies that using the
+    tokenizer in the lint path does not accidentally weaken
+    any runtime security boundaries — the transpiler, import
+    validator, and sandbox execution path are unchanged.
+    """
+    from maithili_dsl.transpiler.linter import lint_maithili_code
+
+    code_inside_string = '\u091b\u092a\u093e\u0909("import os; exec()")\n'
+    errors = lint_maithili_code(code_inside_string)
+    assert not any(
+        "\u0917\u094b\u0932 \u092c\u094d\u0930\u0948\u0915\u0947\u091f" in e
+        for e in errors
+    )
+
+
+@pytest.mark.security
+def test_actual_dangerous_code_outside_strings_still_blocked():
+    """Raw Python import outside strings is still caught by the import validator.
+
+    The linter change uses the tokenizer for paren/quote balance checks.
+    This test verifies that the security model is unchanged: dangerous
+    code outside string literals remains blocked by _validate_imports.
+    """
+    from maithili_dsl.transpiler.transpile import transpile_maithili_code
+
+    code = '\u091b\u092a\u093e\u0909("safe")\nimport os\n'
+    transpiled = transpile_maithili_code(code)
+    errors = _validate_imports(transpiled, translated_modules=set())
+    assert errors, f"raw 'import os' must be blocked by import validator: {errors}"

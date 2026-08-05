@@ -247,3 +247,57 @@ def test_unknown_exception_falls_through():
 
     out = translate_exception_to_maithili(CustomError("demo"))
     assert "CustomError" in out
+
+# ---------------------------------------------------------------------------
+# Regression: parens and quotes inside string literals (issue #30)
+# ---------------------------------------------------------------------------
+
+
+def test_parens_inside_double_quoted_string_not_flagged():
+    code = 'छपाउ("(क")\n'
+    errors = lint_maithili_code(code)
+    assert not any(
+        "गोल ब्रैकेट" in e
+        for e in errors
+    ), f"parens inside double-quoted string falsely flagged: {errors}"
+
+
+def test_parens_inside_single_quoted_string_not_flagged():
+    code = "छपाउ('(क')\n"
+    errors = lint_maithili_code(code)
+    assert not any(
+        "गोल ब्रैकेट" in e
+        for e in errors
+    ), f"parens inside single-quoted string falsely flagged: {errors}"
+
+
+def test_quote_inside_string_not_flagged():
+    code = 'छपाउ("it\'s ok")\n'
+    assert "it's ok" in code
+    errors = lint_maithili_code(code)
+    assert not any("उद्धरण" in e for e in errors), (
+        f"apostrophe in double-quoted string falsely flagged: {errors}"
+    )
+
+
+def test_unbalanced_single_quote_flagged():
+    code = "छपाउ('hi)\n"
+    errors = lint_maithili_code(code)
+    assert any("उद्धरण" in e for e in errors), (
+        f"unbalanced single quote not flagged: {errors}"
+    )
+
+
+def test_genuinely_unbalanced_parens_still_flagged():
+    errors = lint_maithili_code("छपाउ(x\n")
+    assert any(
+        "गोल ब्रैकेट" in e
+        for e in errors
+    ), f"genuinely unbalanced parens not flagged: {errors}"
+
+
+def test_genuinely_unbalanced_quotes_still_flagged():
+    errors = lint_maithili_code('छपाउ("hi)\n')
+    assert any("उद्धरण" in e for e in errors), (
+        f"genuinely unbalanced quotes not flagged: {errors}"
+    )
