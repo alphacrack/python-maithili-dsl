@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Non-UTF-8 `.dmai` files now return a dedicated CLI error instead of a
+  raw Python traceback. Closes #27.
+
 ## [0.4.0] — 2026-07-23
 
 First release published to PyPI since 0.2.0 (0.3.0 was an internal

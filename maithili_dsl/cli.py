@@ -103,6 +103,7 @@ EXIT_NOT_FOUND = 3
 EXIT_LINT_ERROR = 4
 EXIT_IMPORT_BLOCKED = 5
 EXIT_RUNTIME_ERROR = 6
+EXIT_BAD_ENCODING = 7
 
 
 def run_dmai_file(file_path):
@@ -116,8 +117,15 @@ def run_dmai_file(file_path):
         print(f"Error: File '{file_path}' not found.")
         return EXIT_NOT_FOUND
 
-    with open(path, 'r', encoding='utf-8') as file:
-        maithili_code = file.read()
+    try:
+        with open(path, 'r', encoding='utf-8') as file:
+            maithili_code = file.read()
+    except UnicodeDecodeError:
+        print("⚠️ त्रुटि: फाइल UTF-8 में नहि अछि।")
+        return EXIT_BAD_ENCODING
+    except OSError:
+        print("⚠️ त्रुटि: फाइल पढ़ल नहि जा सकल।")
+        return EXIT_NOT_FOUND
 
     errors = lint_maithili_code(maithili_code)
     if errors:

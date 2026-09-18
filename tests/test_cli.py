@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from maithili_dsl.cli import (
+    EXIT_BAD_ENCODING,
     EXIT_IMPORT_BLOCKED,
     EXIT_LINT_ERROR,
     EXIT_NOT_FOUND,
@@ -28,6 +29,34 @@ def test_missing_file_returns_not_found(capsys):
     captured = capsys.readouterr()
     assert code == EXIT_NOT_FOUND
     assert "not found" in captured.out.lower()
+
+
+def test_non_utf8_file_returns_bad_encoding(tmp_path, capsys):
+    path = tmp_path / "invalid.dmai"
+    path.write_bytes(b"\xff\xfe")
+
+    code = run_dmai_file(str(path))
+    captured = capsys.readouterr()
+
+    assert code == EXIT_BAD_ENCODING
+    assert "UTF-8" in captured.out
+    assert "Traceback" not in captured.out
+
+
+def test_unreadable_file_returns_not_found(tmp_path, monkeypatch, capsys):
+    path = tmp_path / "unreadable.dmai"
+    path.write_text("छपाउ(\"hello\")\n", encoding="utf-8")
+
+    def deny_read(*args, **kwargs):
+        raise PermissionError("private path details")
+
+    monkeypatch.setattr("builtins.open", deny_read)
+    code = run_dmai_file(str(path))
+    captured = capsys.readouterr()
+
+    assert code == EXIT_NOT_FOUND
+    assert "फाइल पढ़ल नहि जा सकल" in captured.out
+    assert "private path details" not in captured.out
 
 
 def test_lint_error_returns_lint_exit_code(tmp_dmai_file, capsys):

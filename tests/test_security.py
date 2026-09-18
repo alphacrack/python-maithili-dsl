@@ -22,6 +22,7 @@ from maithili_dsl.cli import (
     _validate_imports,
     run_dmai_file,
     translate_imports,
+    EXIT_BAD_ENCODING,
     EXIT_OK,
     EXIT_IMPORT_BLOCKED,
     EXIT_RUNTIME_ERROR,
@@ -291,3 +292,16 @@ def test_actual_dangerous_code_outside_strings_still_blocked():
     transpiled = transpile_maithili_code(code)
     errors = _validate_imports(transpiled, translated_modules=set())
     assert errors, f"raw 'import os' must be blocked by import validator: {errors}"
+
+
+@pytest.mark.security
+def test_invalid_encoding_is_rejected_before_execution(tmp_path, capsys):
+    """Malformed source must fail closed without reaching the sandbox."""
+    path = tmp_path / "invalid.dmai"
+    path.write_bytes(b"\xff\xfe")
+
+    code = run_dmai_file(str(path))
+    captured = capsys.readouterr()
+
+    assert code == EXIT_BAD_ENCODING
+    assert "UTF-8" in captured.out
